@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/libs/internal_impl-22.2.1.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.1-c745745ff4292f85d11f6ef1aa18e23f2b3fbd62.jar" />
+    </item>
+    <item
+        jar="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="f8efd0096475e0daf054267b61544e10dc776503">
+        <dex dex="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/pre-dexed/debug/classes-9e584a51012823a9d8d78d983eb4df58d34eeadc.jar" />
+    </item>
+    <item
+        jar="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/pre-dexed/debug/classes-aa8bf5be0c3dba26c8299cb644ea4a1ec4a517b2.jar" />
+    </item>
+    <item
+        jar="/Users/naoya/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.1/support-annotations-22.2.1.jar"
+        jumboMode="false"
+        revision="22.0.0"
+        sha1="61a0ff5c29295ec56d7e0bd3d25d95dbf71b4b2b">
+        <dex dex="/Users/naoya/Projects/theta_newmodel/CityWalkersMeter/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.1-257fa81cae0196d01619303412407bd117953b9a.jar" />
+    </item>
+
+</items>
