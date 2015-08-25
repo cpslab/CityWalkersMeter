@@ -17,113 +17,8 @@
             android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="今回この街に来た目的は何ですか？"
-                android:id="@+id/textView"
-                android:textSize="20dp"
-                android:layout_below="@+id/question1"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <RadioGroup
-                android:id="@+id/radioGroup"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/textView"
-                android:layout_marginTop="10dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true">
-
-                <RadioButton
-                    android:text="買い物"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="食事"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="余暇（映画鑑賞など）"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="散歩"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="通院"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="仕事"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <RadioButton
-                    android:text="その他"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </RadioGroup>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="どなたと来られましたか？"
-                android:id="@+id/ques2_text"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="10dp"
-                android:textSize="20dp"
-                android:layout_below="@+id/question1"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <CheckBox
-                android:id="@+id/q2_check1"
-                android:text="乳幼児・未就学児"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/q2_check2"
-                android:text="小・中学生"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/q2_check3"
-                android:text="高校生"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/q2_check4"
-                android:text="１８才〜６４才の成人"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/q2_check5"
-                android:text="６５才以上の成人"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <CheckBox
-                android:id="@+id/q2_check6"
-                android:text="同伴者無し"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
                 android:text="性別"
                 android:textSize="20dp"
-                android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -160,14 +55,150 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <Spinner
-                android:id="@+id/age_list"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content">
-            </Spinner>
+            <RadioGroup
+                android:id="@+id/age_group"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true">
+
+                <RadioButton
+                    android:text="10代"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="20代"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="30代"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="40代"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="50代"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:text="60代以上"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </RadioGroup>
 
             <TextView
-                android:text="住所"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今回この街に来た目的は何ですか？\n※複数選択可"
+                android:id="@+id/textView"
+                android:textSize="20dp"
+                android:layout_below="@+id/question1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp" />
+
+                <CheckBox
+                    android:id="@+id/q3_check1"
+                    android:text="買い物"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check2"
+                    android:text="食事"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check3"
+                    android:text="余暇（映画鑑賞など）"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check4"
+                    android:text="散歩"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check5"
+                    android:text="通院"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check6"
+                    android:text="仕事"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/q3_check7"
+                    android:text="その他"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="どなたと来られましたか？\n※複数選択可"
+                android:id="@+id/ques2_text"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="20dp"
+                android:layout_below="@+id/question1"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+            <CheckBox
+                android:id="@+id/q4_check1"
+                android:text="乳幼児・未就学児"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/q4_check2"
+                android:text="小・中学生"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/q4_check3"
+                android:text="高校生"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/q4_check4"
+                android:text="１８才〜６４才の成人"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/q4_check5"
+                android:text="６５才以上の成人"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/q4_check6"
+                android:text="同伴者無し"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="住所 ※未記入可、市町村区までの住所を記入してください。"
                 android:textSize="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="10dp"
@@ -191,5 +222,4 @@
 
         </LinearLayout>
     </ScrollView>
-
 </RelativeLayout>

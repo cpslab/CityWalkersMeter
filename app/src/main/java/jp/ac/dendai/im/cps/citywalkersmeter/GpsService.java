@@ -9,15 +9,17 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GpsService extends Service implements LocationListener {
 
@@ -25,13 +27,19 @@ public class GpsService extends Service implements LocationListener {
     private ArrayList<LogData> logs = new ArrayList<>();
     private LocationManager locationManager;
     private SharedPreferences prefs;
+    private Timer timer = null;
+    private int nowTime = 0;
 
     private static String POST_URL = "http://citylog.cps.im.dendai.ac.jp/api/logs/update";
     private static String PARAM_USER_ID = "userId";
     private static String PARAM_LOGS = "logs";
 
+    private final IBinder mBinder = new GpsServiceBinder();
 
-    public GpsService() {
+    public class GpsServiceBinder extends Binder {
+        GpsService getService() {
+            return GpsService.this;
+        }
     }
 
     @Override
@@ -68,6 +76,8 @@ public class GpsService extends Service implements LocationListener {
 
         //サービス永続化
         startForeground(R.string.app_name, builder.build());
+
+        setFinishTime(6);
     }
 
     @Override
@@ -85,7 +95,17 @@ public class GpsService extends Service implements LocationListener {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
     }
 
     private void exec_post(LogData data) {
@@ -93,14 +113,14 @@ public class GpsService extends Service implements LocationListener {
             @Override
             public void onPostCompleted(String response) {
                 String str = "送信成功 : " + response;
-                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 Log.d("posttest", response);
             }
 
             @Override
             public void onPostFailed(String response) {
                 String str = "送信失敗 : " + response;
-                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 Log.d("posttest", response);
             }
         };
@@ -117,11 +137,38 @@ public class GpsService extends Service implements LocationListener {
         task.execute();
     }
 
+    public LogData getData() {
+        if (logs.size() -1 < 0) {
+            return null;
+        }
+        return logs.get(logs.size()-1);
+    }
+
+    public void setFinishTime(int hour) {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+
+        nowTime = 0;
+        final int sec = hour *60 *60;
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                nowTime++;
+                if (nowTime > sec) {
+                    stopSelf();
+                }
+            }
+        }, 0, 1000);
+    }
+
     //---------GPS location-----------
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(getApplicationContext(), "GPS検知", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "GPS検知", Toast.LENGTH_SHORT).show();
 
         LogData data = LogData.newInstance(
                 location.getLatitude(),
@@ -135,12 +182,12 @@ public class GpsService extends Service implements LocationListener {
 
         logs.add(data);
 
-        if (logs.size() >= 5) {
+        if (logs.size() >= 20) {
             for (LogData item : logs) {
                 exec_post(item);
             }
 
-            Toast.makeText(getApplicationContext(), "5個たまったので送信しました", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), "20個たまったので送信しました", Toast.LENGTH_SHORT).show();
             logs.clear();
         }
     }

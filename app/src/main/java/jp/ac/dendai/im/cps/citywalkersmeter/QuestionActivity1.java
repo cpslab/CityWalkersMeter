@@ -8,25 +8,34 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 public class QuestionActivity1 extends ActionBarActivity {
 
     private static String POST_URL = "http://citylog.cps.im.dendai.ac.jp/api/questionnaires/update";
     private static String PARAM_USER_ID = "userId";
+    /*
     private static String PARAM_Q1 = "q1";
     private static String PARAM_Q2 = "q2";
     private static String PARAM_Q3 = "sex";
     private static String PARAM_Q4 = "age";
     private static String PARAM_Q5 = "address";
+    */
+    private static String PARAM_Q1 = "sex";
+    private static String PARAM_Q2 = "age";
+    private static String PARAM_Q3 = "q1";
+    private static String PARAM_Q4 = "q2";
+    private static String PARAM_Q5 = "address";
+       /*
+       * q1 : 性別
+       * p2 : 年齢
+       * q3 : 目的
+       * q4 : 同伴者
+       * q5 : 住所
+       */
 
     private SharedPreferences prefs;
     private int age = 0;
@@ -37,98 +46,91 @@ public class QuestionActivity1 extends ActionBarActivity {
         setContentView(R.layout.question1);
 
         prefs = getSharedPreferences("city_walker_id", Context.MODE_PRIVATE);
-
-        //年齢ドロップダウンメニュー
-        ArrayList<Integer> ages = new ArrayList<>();
-        for (int i = 10; i <= 100; i++) {
-            ages.add(i);
-        }
-
-        final ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, ages);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        final Spinner spinner = (Spinner) findViewById(R.id.age_list);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                age = (Integer) parent.getItemAtPosition(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-        spinner.setAdapter(adapter);
     }
 
+    /*
+     * q1 : 性別
+     * p2 : 年齢
+     * q3 : 目的
+     * q4 : 同伴者
+     * q5 : 住所
+     */
     public void onSendClick(View v) {
         String result = "";
         int q1 = -1;
-        int q2 = 0;
-        int q3 = -1;
-        int q4 = -1;
+        int q2 = -1;
+        int q3 = 0;
+        int q4 = 0;
         String address = "";
 
-        //問題１
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        q1 = radioGroup.getCheckedRadioButtonId() -1;
+        //問題1
+        RadioGroup gender = (RadioGroup) findViewById(R.id.gender);
+        q1 = gender.getCheckedRadioButtonId();
         if (q1 < 0) {
-            Toast.makeText(this, "問題１が選択されていません", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "性別が選択されていません", Toast.LENGTH_SHORT).show();
             return;
         }
-        result += "問題１ -> " + q1 + "\n";
+        result += "問題1 -> " + q3 + "\n";
 
         //問題2
-        int[] ids = new int[]{ R.id.q2_check1, R.id.q2_check2, R.id.q2_check3, R.id.q2_check4, R.id.q2_check5, R.id.q2_check6 };
+        q2 = age;
+        if (q2 < 0) {
+            Toast.makeText(this, "年齢を選択してください", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        result += "問題2 -> " + q4 + "\n";
+
+        //問題3
+        int[] ids = new int[]{ R.id.q3_check1, R.id.q3_check2, R.id.q3_check3, R.id.q3_check4, R.id.q3_check5, R.id.q3_check6 };
         CheckBox[] boxs = new CheckBox[6];
         for (int i = 0; i < 6; i++) {
             boxs[i] = (CheckBox) findViewById(ids[i]);
 
-            q2 <<= 1;
+            q3 <<= 1;
             if (boxs[i].isChecked()) {
-                q2 += 1;
+                q3 += 1;
             }
         }
 
-        if (q2 == 0) {
-            Toast.makeText(this, "問題２が選択されていません", Toast.LENGTH_SHORT).show();
+        if (q3 == 0) {
+            Toast.makeText(this, "問題3が選択されていません", Toast.LENGTH_SHORT).show();
             return;
         }
-        result += Integer.toBinaryString(q2) + "\n";
-
-
-        //問題3
-        RadioGroup gender = (RadioGroup) findViewById(R.id.gender);
-        q3 = gender.getCheckedRadioButtonId();
-        if (q3 < 0) {
-            Toast.makeText(this, "問題３が選択されていません", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        result += "問題３ -> " + q3 + "\n";
+        result += Integer.toBinaryString(q3) + "\n";
 
         //問題4
-        q4 = age;
-        if (q4 < 0) {
-            Toast.makeText(this, "年齢を選択してください", Toast.LENGTH_SHORT).show();
+        ids = new int[]{ R.id.q4_check1, R.id.q4_check2, R.id.q4_check3, R.id.q4_check4, R.id.q4_check5, R.id.q4_check6 };
+        boxs = new CheckBox[6];
+        for (int i = 0; i < 6; i++) {
+            boxs[i] = (CheckBox) findViewById(ids[i]);
+
+            q4 <<= 1;
+            if (boxs[i].isChecked()) {
+                q4 += 1;
+            }
+        }
+
+        if (q4 == 0) {
+            Toast.makeText(this, "問題4が選択されていません", Toast.LENGTH_SHORT).show();
             return;
         }
-        result += "問題４ -> " + q4 + "\n";
+        result += Integer.toBinaryString(q4) + "\n";
+
 
         //問題５
+        //住所は未記入でも可
         EditText editText = (EditText)findViewById(R.id.address);
         address = editText.getText().toString();
-        if (address.equals("")) {
-            Toast.makeText(this, "住所が入力されていません", Toast.LENGTH_SHORT).show();
-        }
 
         result += "問題５ -> " + address;
 
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
 
         HttpPostHandler postHandler = new HttpPostHandler() {
             @Override
             public void onPostCompleted(String response) {
                 String str = "送信成功 : " + response;
-                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 Log.d("posttest", response);
 
             }
@@ -136,11 +138,18 @@ public class QuestionActivity1 extends ActionBarActivity {
             @Override
             public void onPostFailed(String response) {
                 String str = "送信失敗 : " + response;
-                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 Log.d("posttest", response);
             }
         };
 
+       /*
+       * q1 : 性別
+       * p2 : 年齢
+       * q3 : 目的
+       * q4 : 同伴者
+       * q5 : 住所
+       */
         HttpPostTask task = new HttpPostTask(POST_URL, postHandler);
         task.addPostParam(PARAM_USER_ID, String.valueOf(prefs.getInt(PARAM_USER_ID, -1)));
         task.addPostParam(PARAM_Q1, String.valueOf(q1));
@@ -150,7 +159,7 @@ public class QuestionActivity1 extends ActionBarActivity {
         task.addPostParam(PARAM_Q5, address);
         task.execute();
 
-        Toast.makeText(this, "アンケートにご協力いただきありがとうございました。", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "アンケートにご協力頂きありがとう御座いました。", Toast.LENGTH_LONG).show();
         finish();
     }
 
