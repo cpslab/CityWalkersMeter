@@ -35,11 +35,13 @@
 
                     <RadioButton
                         android:text="男"
+                        android:id="@+id/otoko"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <RadioButton
                         android:text="女"
+                        android:id="@+id/onna"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
@@ -65,31 +67,37 @@
 
                 <RadioButton
                     android:text="10代"
+                    android:id="@+id/ten"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <RadioButton
                     android:text="20代"
+                    android:id="@+id/twenty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <RadioButton
                     android:text="30代"
+                    android:id="@+id/thirty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <RadioButton
                     android:text="40代"
+                    android:id="@+id/forty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <RadioButton
                     android:text="50代"
+                    android:id="@+id/fifty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <RadioButton
                     android:text="60代以上"
+                    android:id="@+id/sixty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 

@@ -66,6 +66,17 @@ public class QuestionActivity1 extends ActionBarActivity {
         //問題1
         RadioGroup gender = (RadioGroup) findViewById(R.id.gender);
         q1 = gender.getCheckedRadioButtonId();
+        switch (q1) {
+            case R.id.otoko:
+                q1 = 0;
+                break;
+            case R.id.onna:
+                q1 = 1;
+                break;
+            default:
+                q1 = -1;
+                break;
+        }
         if (q1 < 0) {
             Toast.makeText(this, "性別が選択されていません", Toast.LENGTH_SHORT).show();
             return;
@@ -73,12 +84,36 @@ public class QuestionActivity1 extends ActionBarActivity {
         result += "問題1 -> " + q3 + "\n";
 
         //問題2
-        q2 = age;
+        RadioGroup age = (RadioGroup) findViewById(R.id.age_group);
+        q2 = age.getCheckedRadioButtonId();
+        switch (q2) {
+            case R.id.ten:
+                q2 = 0;
+                break;
+            case R.id.twenty:
+                q2 = 1;
+                break;
+            case R.id.thirty:
+                q2 = 2;
+                break;
+            case R.id.forty:
+                q2 = 3;
+                break;
+            case R.id.fifty:
+                q2 = 4;
+                break;
+            case R.id.sixty:
+                q2 = 5;
+                break;
+            default:
+                q2 = -1;
+                break;
+        }
         if (q2 < 0) {
             Toast.makeText(this, "年齢を選択してください", Toast.LENGTH_SHORT).show();
             return;
         }
-        result += "問題2 -> " + q4 + "\n";
+        result += "問題2 -> " + q2 + "\n";
 
         //問題3
         int[] ids = new int[]{ R.id.q3_check1, R.id.q3_check2, R.id.q3_check3, R.id.q3_check4, R.id.q3_check5, R.id.q3_check6 };
