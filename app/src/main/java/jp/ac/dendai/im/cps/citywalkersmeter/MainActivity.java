@@ -31,6 +31,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     private static String REGIST_URL = "http://citylog.cps.im.dendai.ac.jp/api/users/regist";
     private static String PARAM_USER_ID = "userId";
+    static final String PARAM_PROJECT_ID = "projectId";
     private static String PARAM_IS_SERVICE = "isService";
     private static String PARAM_FINISH_TIME = "finishTime";
 
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             };
 
             HttpPostTask task = new HttpPostTask(REGIST_URL, postHandler);
+            task.addPostParam(PARAM_PROJECT_ID, String.valueOf(0));
             task.execute();
         }
         else {

@@ -33,7 +33,10 @@
         <service
             android:name=".GpsService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </service>
     </application>
 

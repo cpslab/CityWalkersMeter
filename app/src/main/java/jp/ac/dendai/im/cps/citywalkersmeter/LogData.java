@@ -83,7 +83,7 @@ public class LogData {
     public String JSONFormat() {
         return "{ \"lat\": " + this.latitude + ","
                 + " \"lng\":" + this.longitude + ","
-                + " \"acc\":" + (float)this.accuracy + ","
+                + " \"accuracy\":" + (float)this.accuracy + ","
                 + " \"timestamp\":" + this.time + ","
                 + " \"speed\":" + this.speed + ","
                 + " \"altitude\":" + this.altitude + ","
