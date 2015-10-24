@@ -34,6 +34,7 @@ public class GpsService extends Service implements LocationListener {
     private static String POST_URL = "http://citylog.cps.im.dendai.ac.jp/api/logs/update";
     private static String PARAM_USER_ID = "userId";
     private static String PARAM_LOGS = "logs";
+    private static String PARAM_INTERVAL_TIME = "intervalTime";
 
     private final IBinder mBinder = new GpsServiceBinder();
 
@@ -47,6 +48,8 @@ public class GpsService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
 
+        prefs = getSharedPreferences("city_walker_id", Context.MODE_PRIVATE);
+
         //gps
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
@@ -57,9 +60,13 @@ public class GpsService extends Service implements LocationListener {
             settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(settingsIntent);
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 5, this);
 
-        prefs = getSharedPreferences("city_walker_id", Context.MODE_PRIVATE);
+        int intervalTime = prefs.getInt(PARAM_INTERVAL_TIME, -1);
+        if (intervalTime < 0) { intervalTime = 2; }
+        SharedPreferences.Editor intervalEditor = prefs.edit();
+        intervalEditor.putInt(PARAM_INTERVAL_TIME, intervalTime);
+        intervalEditor.commit();
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, intervalTime *1000, 5, this);
 
         //通知押下時に、ServiceのOnStartCommandを指出すためのIntent
         /*
@@ -192,6 +199,11 @@ public class GpsService extends Service implements LocationListener {
                 }
             }
         }, 0, 1000);
+    }
+
+    public void setIntervalTime(int second) {
+        locationManager.removeUpdates(this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, second *1000, 5, this);
     }
 
     //---------GPS location-----------

@@ -13,7 +13,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -50,12 +50,37 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="以下の開始ボタンを押すと計測を開始します。
-                        \n終了する際は以下の終了ボタンを押してください。終了ボタンが押されるまではアプリを終了しても計測は終了しません。
-                        \nデータは１５秒間隔で計測し５分間隔でサーバーにアップロードします。"
+                        \n終了する際は以下の終了ボタンを押してください。終了ボタンが押されるまではアプリを終了しても計測は終了しません。"
                 android:id="@+id/textView3"
                 android:layout_below="@+id/textView2"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="データ取得間隔：2秒"
+                android:id="@+id/intervalTimeStr"
+                android:layout_gravity="center_horizontal|left"
+                android:textSize="16dp"
+                android:textColor="@color/black"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="データ取得間隔を設定します。\nデフォルトでは2秒に設定されており、20個間隔でサーバにアップロードします。"
+                android:id="@+id/textView8"
+                android:layout_marginTop="5dp" />
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/intervalTimeSeekBar"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:max="15"
+                android:progress="2" />
 
             <TextView
                 android:layout_width="wrap_content"

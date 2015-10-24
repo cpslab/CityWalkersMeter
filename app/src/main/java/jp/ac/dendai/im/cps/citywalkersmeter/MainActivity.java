@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     static final String PARAM_PROJECT_ID = "projectId";
     private static String PARAM_IS_SERVICE = "isService";
     private static String PARAM_FINISH_TIME = "finishTime";
+    private static String PARAM_INTERVAL_TIME = "intervalTime";
 
     /*
      * 0 : latitude
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         finishTextView.setText("強制終了時間 : " + String.valueOf(finishTime) + " 時間");
 
         final TextView progressTextView = finishTextView;
-        //seekbarの初期化
+        //finishSeekbarの初期化
         SeekBar seekBar = (SeekBar) findViewById(R.id.finishSeekBar);
         seekBar.setProgress(finishTime);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -170,6 +171,9 @@ public class MainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //つまみを離した時に呼ばれる
                 changedNumber = seekBar.getProgress();
+
+                if (changedNumber < 1) { changedNumber = 1; }
+
                 progressTextView.setText("強制終了時間 : " + String.valueOf(changedNumber) + " 時間");
 
                 //時間の保存
@@ -181,6 +185,57 @@ public class MainActivity extends AppCompatActivity {
                 setFinishTime2Service(changedNumber);
             }
         });
+
+        //取得間隔を設定
+        int intervalTime = prefs.getInt(PARAM_INTERVAL_TIME, -1);
+        if (intervalTime < 0) {
+            intervalTime = 2;
+            SharedPreferences.Editor intervalEditor = prefs.edit();
+            intervalEditor.putInt(PARAM_INTERVAL_TIME, intervalTime);
+            intervalEditor.commit();
+        }
+
+        //intervalTimeの表示
+        TextView intervalTextView = (TextView) findViewById(R.id.intervalTimeStr);
+        intervalTextView.setText("データ取得間隔 : " + String.valueOf(intervalTime) + " 秒");
+
+        final TextView staticIntervalTextView = intervalTextView;
+        //intervalSeekbarの初期化
+        SeekBar intervalTimeSeekBar = (SeekBar) findViewById(R.id.intervalTimeSeekBar);
+        intervalTimeSeekBar.setProgress(intervalTime);
+        intervalTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int changedNumber;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                //つまみを動かした際に呼ばれる
+                changedNumber = seekBar.getProgress();
+                staticIntervalTextView.setText("データ取得間隔 : " + String.valueOf(changedNumber) + " 秒");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                //つまみに触れた時に呼ばれる
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //つまみを離した時に呼ばれる
+                changedNumber = seekBar.getProgress();
+
+                if (changedNumber < 1) { changedNumber = 1; }
+
+                staticIntervalTextView.setText("データ取得間隔 : " + String.valueOf(changedNumber) + " 秒");
+
+                //時間の保存
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(PARAM_INTERVAL_TIME, changedNumber);
+                editor.commit();
+
+                //serviceに設定
+                setIntervalTime2Service(changedNumber);
+            }
+        });
     }
 
     public void setFinishTime2Service(final int time) {
@@ -188,6 +243,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         mService.setFinishTime(time);
+    }
+
+    public void setIntervalTime2Service(final int time) {
+        if (mService == null) {
+            return;
+        }
     }
 
     public void startStrTimer() {
@@ -366,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
