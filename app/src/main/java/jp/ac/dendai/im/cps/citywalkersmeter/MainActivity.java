@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -124,13 +125,14 @@ public class MainActivity extends AppCompatActivity {
                 public void onPostFailed(String response) {
                     String str = "登録失敗 : " + response;
 //                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                    Log.d("MainActivity", str);
                     handlerIdStr.setText("端末ID : ERROR");
                     idErrorStr.setVisibility(View.VISIBLE);
                 }
             };
 
             HttpPostTask task = new HttpPostTask(REGIST_URL, postHandler);
-            task.addPostParam(PARAM_PROJECT_ID, String.valueOf(0));
+            task.addPostParam(PARAM_PROJECT_ID, String.valueOf(114));
             task.execute();
         }
         else {
@@ -355,7 +357,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onQuesionClick(View v){
-        startActivity(new Intent(this, QuestionActivity1.class));
+//        startActivity(new Intent(this, QuestionActivity1.class));
+
+        // GoogleForm ブラウザ起動
+        Uri uri = Uri.parse("http://goo.gl/forms/fgVARBcgyO");
+        Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+        startActivity(intent);
     }
 
     public void onTestSend(View v) {
