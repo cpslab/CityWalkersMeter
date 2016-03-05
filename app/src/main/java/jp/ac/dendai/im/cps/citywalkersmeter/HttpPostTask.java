@@ -151,6 +151,15 @@ public class HttpPostTask extends AsyncTask<Void, Void, Void> {
                         );
                         break;
                     }
+                    case HttpStatus.SC_BAD_REQUEST: {
+                        //404
+                        Log.d(LOG_CODE, "400");
+                        HttpPostTask.this.http_err_msg = EntityUtils.toString(
+                                httpResponse.getEntity(),
+                                HttpPostTask.this.response_encodeing
+                        );
+                        break;
+                    }
                     case HttpStatus.SC_NOT_FOUND: {
                         //404
                         Log.d(LOG_CODE, "404");
