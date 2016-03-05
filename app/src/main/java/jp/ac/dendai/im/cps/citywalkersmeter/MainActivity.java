@@ -29,13 +29,17 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import jp.ac.dendai.im.cps.citywalkersmeter.networks.ApiClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity {
-    private static String REGIST_URL = "http://citylog.cps.im.dendai.ac.jp/api/users/regist";
     private static String PARAM_USER_ID = "userId";
-    static final String PARAM_PROJECT_ID = "projectId";
     private static String PARAM_IS_SERVICE = "isService";
     private static String PARAM_FINISH_TIME = "finishTime";
     private static String PARAM_INTERVAL_TIME = "intervalTime";
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     /*
      * 0 : latitude
@@ -92,17 +96,28 @@ public class MainActivity extends AppCompatActivity {
         TextView idStr = (TextView)findViewById(R.id.id);
 
         if (myId < 0) {
-            HttpPostHandler postHandler = new HttpPostHandler() {
+            ApiClient client = new ApiClient() {
                 TextView handlerIdStr = (TextView)findViewById(R.id.id);
                 TextView idErrorStr = (TextView)findViewById(R.id.idErrorStr);
 
                 @Override
-                public void onPostCompleted(String response) {
-                    String str = "登録成功 : " + response;
-                    Log.d("testpost", response);
+                public void onFailure(Request request, IOException e) {
+                    String str = "登録失敗";
+//                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                    Log.d("MainActivity", str);
+                    handlerIdStr.setText("端末ID : ERROR");
+                    idErrorStr.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    String str = response.body().string();
+                    Log.d("testpost", "登録成功 : " + str);
+                    Log.d("onResponse", "onResponse: " + response.message());
+                    Log.d("onResponse", "onResponse: " + response.toString());
 
                     try {
-                        JSONObject object = new JSONObject(response);
+                        JSONObject object = new JSONObject(str);
                         Log.d("testpost", object.getString("id"));
 
                         int id = Integer.valueOf(object.getString("id"));
@@ -118,22 +133,9 @@ public class MainActivity extends AppCompatActivity {
                         handlerIdStr.setText("端末ID : ERROR");
                         idErrorStr.setVisibility(View.VISIBLE);
                     }
-
-//                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onPostFailed(String response) {
-                    String str = "登録失敗 : " + response;
-//                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-                    Log.d("MainActivity", str);
-                    handlerIdStr.setText("端末ID : ERROR");
-                    idErrorStr.setVisibility(View.VISIBLE);
                 }
             };
-
-            HttpPostTask task = new HttpPostTask(REGIST_URL, postHandler);
-            task.addPostParam(PARAM_PROJECT_ID, String.valueOf(114));
-            task.execute();
+            client.postUserId(String.valueOf(114));
         }
         else {
             idStr.setText("端末ID : " + String.valueOf(myId));
@@ -184,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
 
                 //serviceに設定
-                setFinishTime2Service(changedNumber);
+//                setFinishTime2Service(changedNumber);
             }
         });
 
@@ -235,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
 
                 //serviceに設定
-                setIntervalTime2Service(changedNumber);
+//                setIntervalTime2Service(changedNumber);
             }
         });
     }
