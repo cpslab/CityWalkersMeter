@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
+import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,7 +18,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
@@ -26,6 +25,7 @@ import android.util.Log;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,18 +33,20 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import jp.ac.dendai.im.cps.citywalkersmeter.activities.MainActivity;
 import jp.ac.dendai.im.cps.citywalkersmeter.networks.ApiClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
-public class GpsService extends Service implements LocationListener, SensorEventListener {
+public class GpsService extends Service implements LocationListener, SensorEventListener2 {
     private static final String TAG = GpsService.class.getSimpleName();
 
     private NotificationManager mNotificationManager;
     private LocationManager locationManager;
     private SharedPreferences prefs;
-    private Timer timer = new Timer();
+    private Timer timer;
+    private Timer uplaodTimer;
     private int nowTime = 0;
     private LogData sensingData = new LogData();
     private SensorManager mSensorManager;
@@ -57,7 +59,7 @@ public class GpsService extends Service implements LocationListener, SensorEvent
     private final IBinder mBinder = new GpsServiceBinder();
 
     public class GpsServiceBinder extends Binder {
-        GpsService getService() {
+        public GpsService getService() {
             return GpsService.this;
         }
     }
@@ -70,14 +72,6 @@ public class GpsService extends Service implements LocationListener, SensorEvent
 
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        //GPSが無効になっている場合は有効にするよう促す
-        final boolean gpsEnabled = locationManager.isProviderEnabled((LocationManager.GPS_PROVIDER));
-        if (!gpsEnabled) {
-            Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(settingsIntent);
-        }
 
         int intervalTime = prefs.getInt(PARAM_INTERVAL_TIME, -1);
         if (intervalTime < 0) { intervalTime = 2; }
@@ -127,12 +121,7 @@ public class GpsService extends Service implements LocationListener, SensorEvent
 
         setFinishTime(6);
 
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                exec_post();
-            }
-        }, 0, 5000);
+        startTImer();
     }
 
     @Override
@@ -146,6 +135,7 @@ public class GpsService extends Service implements LocationListener, SensorEvent
         Log.d(TAG, "onDestroy: ");
         locationManager.removeUpdates(this);
         mSensorManager.unregisterListener(this);
+        stopTimer();
 
         super.onDestroy();
     }
@@ -166,6 +156,21 @@ public class GpsService extends Service implements LocationListener, SensorEvent
         return super.onUnbind(intent);
     }
 
+    private void startTImer() {
+        uplaodTimer = new Timer();
+        uplaodTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                exec_post();
+            }
+        }, 0, 5000);
+    }
+
+    private void stopTimer() {
+        uplaodTimer.cancel();
+        uplaodTimer = null;
+    }
+
     private void exec_post() {
         ApiClient client = new ApiClient() {
             @Override
@@ -181,12 +186,17 @@ public class GpsService extends Service implements LocationListener, SensorEvent
             }
         };
 
+        if (sensingData.getTimestamp() == 0) {
+            sensingData.setTimestamp((int) (System.currentTimeMillis() / 1000));
+        }
         ObjectMapper mapper = new ObjectMapper();
         try {
+            Gson gson = new Gson();
             String json = mapper.writeValueAsString(sensingData);
-            client.updateLog(String.valueOf(prefs.getInt(PARAM_USER_ID, -1)), json);
+            client.updateLog(String.valueOf(prefs.getInt(PARAM_USER_ID, -1)), gson.toJson(sensingData));
 
-            Log.d("posttest", json);
+            Log.d(TAG, "exec_post: gson" + gson.toJson(sensingData));
+            Log.d(TAG, "exec_post: jackson" + json);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -235,8 +245,6 @@ public class GpsService extends Service implements LocationListener, SensorEvent
         sensingData.setSpeed(location.getSpeed());
         sensingData.setAltitude(location.getAltitude());
         sensingData.setBearing(location.getBearing());
-
-        exec_post();
     }
 
     @Override
@@ -288,10 +296,10 @@ public class GpsService extends Service implements LocationListener, SensorEvent
                 sensingData.setHumidity(event.values[0]);
                 break;
             case Sensor.TYPE_ACCELEROMETER:
-                sensingData.setAccelerometers(new float[]{event.values[0], event.values[1], event.values[2]});
+                sensingData.setAccelerometers(new double[]{event.values[0], event.values[1], event.values[2]});
                 break;
             case Sensor.TYPE_GYROSCOPE:
-                sensingData.setGyroscope(new float[]{event.values[0], event.values[1], event.values[2]});
+                sensingData.setGyroscope(new double[]{event.values[0], event.values[1], event.values[2]});
                 break;
             case Sensor.TYPE_STEP_COUNTER:
                 sensingData.setStep(event.values[0]);
@@ -301,6 +309,11 @@ public class GpsService extends Service implements LocationListener, SensorEvent
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void onFlushCompleted(Sensor sensor) {
 
     }
 }

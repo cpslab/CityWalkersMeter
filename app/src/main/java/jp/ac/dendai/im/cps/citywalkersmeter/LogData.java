@@ -3,6 +3,7 @@ package jp.ac.dendai.im.cps.citywalkersmeter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class LogData implements Serializable {
@@ -17,8 +18,8 @@ public class LogData implements Serializable {
     private float temprature;
     private float humidity;
     private float bearing;
-    private float[] accelerometers;
-    private float[] gyroscope;
+    private double[] accelerometers;
+    private double[] gyroscope;
     private float sound;
     private float step;
     private int is_active;
@@ -114,19 +115,19 @@ public class LogData implements Serializable {
         this.bearing = bearing;
     }
 
-    public float[] getAccelerometers() {
+    public double[] getAccelerometers() {
         return accelerometers;
     }
 
-    public void setAccelerometers(float[] accelerometers) {
+    public void setAccelerometers(double[] accelerometers) {
         this.accelerometers = accelerometers;
     }
 
-    public float[] getGyroscope() {
+    public double[] getGyroscope() {
         return gyroscope;
     }
 
-    public void setGyroscope(float[] gyroscope) {
+    public void setGyroscope(double[] gyroscope) {
         this.gyroscope = gyroscope;
     }
 
@@ -178,14 +179,28 @@ public class LogData implements Serializable {
         this.timestamp = timestamp;
     }
 
-//    public String JSONFormat() {
-//        return "{ \"lat\": " + this.latitude + ","
-//                + " \"lng\":" + this.longitude + ","
-//                + " \"accuracy\":" + (float)this.accuracy + ","
-//                + " \"timestamp\":" + this.time + ","
-//                + " \"speed\":" + this.speed + ","
-//                + " \"altitude\":" + this.altitude + ","
-//                + " \"bearing\":" + this.bearing
-//                + "}";
-//    }
+    @Override
+    public String toString() {
+        return "LogData{" +
+                "lat=" + lat +
+                ", lng=" + lng +
+                ", accuracy=" + accuracy +
+                ", altitude=" + altitude +
+                ", accuracy_altitude=" + accuracy_altitude +
+                ", speed=" + speed +
+                ", light=" + light +
+                ", pressure=" + pressure +
+                ", temprature=" + temprature +
+                ", humidity=" + humidity +
+                ", bearing=" + bearing +
+                ", accelerometers=" + Arrays.toString(accelerometers) +
+                ", gyroscope=" + Arrays.toString(gyroscope) +
+                ", sound=" + sound +
+                ", step=" + step +
+                ", is_active=" + is_active +
+                ", myway='" + myway + '\'' +
+                ", description='" + description + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
