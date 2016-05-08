@@ -38,7 +38,7 @@ captures/
 # AndroidStudio more
 .classpath
 .project
-*.iml
+/* *.iml */
 *.ipr
 *.iws
 .idea/workspace.xml
