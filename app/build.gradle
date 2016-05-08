@@ -16,7 +16,23 @@ android {
         exclude 'META-INF/NOTICE'
     }
     buildTypes {
+        debug{
+            buildConfigField "String", "CITYLOG_SCHEME", "\"${project.property("citylog_scheme")}\""
+            buildConfigField "String", "CITYLOG_HOST", "\"${project.property("citylog_host")}\""
+            buildConfigField "String", "CITYLOG_ROOT", "\"${project.property("citylog_root")}\""
+            buildConfigField "String", "CITYLOG_USERS", "\"${project.property("citylog_users")}\""
+            buildConfigField "String", "CITYLOG_REGIST", "\"${project.property("citylog_regist")}\""
+            buildConfigField "String", "CITYLOG_LOGS", "\"${project.property("citylog_logs")}\""
+            buildConfigField "String", "CITYLOG_UPDATE", "\"${project.property("citylog_update")}\""
+        }
         release {
+            buildConfigField "String", "CITYLOG_SCHEME", "\"${project.property("citylog_scheme")}\""
+            buildConfigField "String", "CITYLOG_HOST", "\"${project.property("citylog_host")}\""
+            buildConfigField "String", "CITYLOG_ROOT", "\"${project.property("citylog_root")}\""
+            buildConfigField "String", "CITYLOG_USERS", "\"${project.property("citylog_users")}\""
+            buildConfigField "String", "CITYLOG_REGIST", "\"${project.property("citylog_regist")}\""
+            buildConfigField "String", "CITYLOG_LOGS", "\"${project.property("citylog_logs")}\""
+            buildConfigField "String", "CITYLOG_UPDATE", "\"${project.property("citylog_update")}\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
