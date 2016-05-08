@@ -1,6 +1,5 @@
 package jp.ac.dendai.im.cps.citywalkersmeter;
 
-import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -9,13 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener2;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -38,8 +36,7 @@ import jp.ac.dendai.im.cps.citywalkersmeter.networks.ApiClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-@TargetApi(Build.VERSION_CODES.KITKAT)
-public class GpsService extends Service implements LocationListener, SensorEventListener2 {
+public class GpsService extends Service implements LocationListener, SensorEventListener {
     private static final String TAG = GpsService.class.getSimpleName();
 
     private NotificationManager mNotificationManager;
@@ -309,11 +306,6 @@ public class GpsService extends Service implements LocationListener, SensorEvent
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    @Override
-    public void onFlushCompleted(Sensor sensor) {
 
     }
 }
