@@ -1,10 +1,9 @@
-package jp.ac.dendai.im.cps.citywalkersmeter;
+package jp.ac.dendai.im.cps.citywalkersmeter.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +11,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import jp.ac.dendai.im.cps.citywalkersmeter.R;
 
 public class QuestionActivity1 extends ActionBarActivity {
 
@@ -161,22 +162,22 @@ public class QuestionActivity1 extends ActionBarActivity {
 
 //        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
 
-        HttpPostHandler postHandler = new HttpPostHandler() {
-            @Override
-            public void onPostCompleted(String response) {
-                String str = "送信成功 : " + response;
-//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-                Log.d("posttest", response);
-
-            }
-
-            @Override
-            public void onPostFailed(String response) {
-                String str = "送信失敗 : " + response;
-//                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-                Log.d("posttest", response);
-            }
-        };
+//        HttpPostHandler postHandler = new HttpPostHandler() {
+//            @Override
+//            public void onPostCompleted(String response) {
+//                String str = "送信成功 : " + response;
+////                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Log.d("posttest", response);
+//
+//            }
+//
+//            @Override
+//            public void onPostFailed(String response) {
+//                String str = "送信失敗 : " + response;
+////                Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                Log.d("posttest", response);
+//            }
+//        };
 
        /*
        * q1 : 性別
@@ -185,14 +186,14 @@ public class QuestionActivity1 extends ActionBarActivity {
        * q4 : 同伴者
        * q5 : 住所
        */
-        HttpPostTask task = new HttpPostTask(POST_URL, postHandler);
-        task.addPostParam(PARAM_USER_ID, String.valueOf(prefs.getInt(PARAM_USER_ID, -1)));
-        task.addPostParam(PARAM_Q1, String.valueOf(q1));
-        task.addPostParam(PARAM_Q2, String.valueOf(q2));
-        task.addPostParam(PARAM_Q3, String.valueOf(q3));
-        task.addPostParam(PARAM_Q4, String.valueOf(q4));
-        task.addPostParam(PARAM_Q5, address);
-        task.execute();
+//        HttpPostTask task = new HttpPostTask(POST_URL, postHandler);
+//        task.addPostParam(PARAM_USER_ID, String.valueOf(prefs.getInt(PARAM_USER_ID, -1)));
+//        task.addPostParam(PARAM_Q1, String.valueOf(q1));
+//        task.addPostParam(PARAM_Q2, String.valueOf(q2));
+//        task.addPostParam(PARAM_Q3, String.valueOf(q3));
+//        task.addPostParam(PARAM_Q4, String.valueOf(q4));
+//        task.addPostParam(PARAM_Q5, address);
+//        task.execute();
 
         Toast.makeText(this, "アンケートにご協力頂きありがとう御座いました。", Toast.LENGTH_LONG).show();
         finish();

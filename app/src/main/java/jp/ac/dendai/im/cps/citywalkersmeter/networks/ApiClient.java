@@ -1,5 +1,7 @@
 package jp.ac.dendai.im.cps.citywalkersmeter.networks;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -10,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 
 public abstract class ApiClient {
     private static final String TAG = ApiClient.class.getSimpleName();
@@ -28,16 +31,25 @@ public abstract class ApiClient {
     }
 
     public void updateLog(String userId, String data) {
+        Log.d(TAG, "updateLog: " + data);
         HttpUrl.Builder builder = UrlBuilder.buildLogsUpdate();
-        RequestBody formBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("logs", data)
+//        RequestBody requestBody = new MultipartBody.Builder()
+//                .setType(MultipartBody.FORM)
+//                .addFormDataPart("userId", userId)
+//                .addFormDataPart("logs", "[" + data + "]")
+//                .build();
+        RequestBody requestBody = new FormBody.Builder()
+                .addEncoded("userId", userId)
+                .addEncoded("logs", "[" + data + "]")
                 .build();
-        post(builder, formBody);
+        post(builder, requestBody);
     }
 
     private void post(HttpUrl.Builder builder, RequestBody body) {
-        final Request request = new Request.Builder().url(builder.build()).post(body).build();
+        final Request request = new Request.Builder().url(builder.build()).addHeader("Content-type", "application/json").post(body).build();
+
+        Log.d(TAG, "post: " + bodyToString(request));
+
         OkHttpClient client = new OkHttpClient();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -50,6 +62,18 @@ public abstract class ApiClient {
                 own.onResponse(response);
             }
         });
+    }
+
+    private static String bodyToString(final Request request){
+
+        try {
+            final Request copy = request.newBuilder().build();
+            final Buffer buffer = new Buffer();
+            copy.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (final IOException e) {
+            return "did not work";
+        }
     }
 
     public abstract void onFailure(Request request, IOException e);

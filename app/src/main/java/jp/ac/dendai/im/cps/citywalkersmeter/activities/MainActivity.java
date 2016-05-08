@@ -1,40 +1,54 @@
-package jp.ac.dendai.im.cps.citywalkersmeter;
+package jp.ac.dendai.im.cps.citywalkersmeter.activities;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import jp.ac.dendai.im.cps.citywalkersmeter.GpsService;
+import jp.ac.dendai.im.cps.citywalkersmeter.LogData;
+import jp.ac.dendai.im.cps.citywalkersmeter.R;
+import jp.ac.dendai.im.cps.citywalkersmeter.dialogs.EditTextDialog;
+import jp.ac.dendai.im.cps.citywalkersmeter.dialogs.OkCancelDialog;
 import jp.ac.dendai.im.cps.citywalkersmeter.networks.ApiClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static String PARAM_USER_ID = "userId";
+    private static String PARAM_PROJECT_ID = "projectId";
     private static String PARAM_IS_SERVICE = "isService";
     private static String PARAM_FINISH_TIME = "finishTime";
     private static String PARAM_INTERVAL_TIME = "intervalTime";
@@ -49,10 +63,24 @@ public class MainActivity extends AppCompatActivity {
      * 4 : bearing
      * 5 : altitude
      * 6 : timestamp
+     * 7 : light
+     * 8 : pressure
+     * 9 : temprature
+     * 10 : humidity
+     * 11 : bearing
+     * 12 : step
+     * 13 : accelerometers_x
+     * 14 : accelerometers_y
+     * 15 : accelerometers_z
+     * 16 : gyroscope_x
+     * 17 : gyroscope_y
+     * 18 : gyroscope_z
      */
-    private TextView[] sensor_strs = new TextView[7];
-//    private int[] sensor_strs_id = new int[]{
-//            R.id.lat_str, R.id.lng_str, R.id.acc_str, R.id.speed_str, R.id.bearing, R.id.alti_str, R.id.time_str };
+    private TextView[] sensor_strs = new TextView[19];
+    private int[] sensor_strs_id = new int[]{
+            R.id.lat_str, R.id.lng_str, R.id.acc_str, R.id.speed_str, R.id.bearing, R.id.alti_str, R.id.time_str,
+            R.id.light_str, R.id.pressure_str, R.id.temprature_str, R.id.humidity_str, R.id.bearing, R.id.step_str,
+            R.id.accelex_str, R.id.acceley_str, R.id.accelez_str, R.id.gyrox_str, R.id.gyroy_str, R.id.gyroz_str};
     private TextView isMesureStr;
     private boolean isBind = false;
     private boolean isTimer = false;
@@ -83,13 +111,23 @@ public class MainActivity extends AppCompatActivity {
         prefs = getSharedPreferences("city_walker_id", Context.MODE_PRIVATE);
 
         //Top画面TextViewの初期化
-//        for (int i = 0; i < sensor_strs_id.length; i++) {
-//            sensor_strs[i] = (TextView)findViewById(sensor_strs_id[i]);
-//            if (i == 1) {
-//                sensor_strs[i].setText("計測中...");
-//            }
-//        }
+        for (int i = 0; i < sensor_strs_id.length; i++) {
+            sensor_strs[i] = (TextView)findViewById(sensor_strs_id[i]);
+            if (i == 1) {
+                sensor_strs[i].setText("計測中...");
+            }
+        }
         isMesureStr = (TextView) findViewById(R.id.isMeasure);
+
+        // projectIdの初期化
+        String projectId = prefs.getString(PARAM_PROJECT_ID, "");
+
+        if (projectId.equals("")) {
+            showInputProjectIdDialog();
+        }
+
+        TextView proIdStr = (TextView)findViewById(R.id.projectId);
+        proIdStr.setText("Project Id : " + projectId);
 
         //UserIdの初期化
         int myId =  prefs.getInt(PARAM_USER_ID, -1);
@@ -135,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             };
-            client.postUserId(String.valueOf(114));
+            client.postUserId(prefs.getString(PARAM_PROJECT_ID, ""));
         }
         else {
             idStr.setText("端末ID : " + String.valueOf(myId));
@@ -186,60 +224,12 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
 
                 //serviceに設定
-//                setFinishTime2Service(changedNumber);
+                setFinishTime2Service(changedNumber);
             }
         });
 
-        //取得間隔を設定
-        int intervalTime = prefs.getInt(PARAM_INTERVAL_TIME, -1);
-        if (intervalTime < 0) {
-            intervalTime = 2;
-            SharedPreferences.Editor intervalEditor = prefs.edit();
-            intervalEditor.putInt(PARAM_INTERVAL_TIME, intervalTime);
-            intervalEditor.commit();
-        }
-
-        //intervalTimeの表示
-        TextView intervalTextView = (TextView) findViewById(R.id.intervalTimeStr);
-        intervalTextView.setText("データ取得間隔 : " + String.valueOf(intervalTime) + " 秒");
-
-        final TextView staticIntervalTextView = intervalTextView;
-        //intervalSeekbarの初期化
-        SeekBar intervalTimeSeekBar = (SeekBar) findViewById(R.id.intervalTimeSeekBar);
-        intervalTimeSeekBar.setProgress(intervalTime);
-        intervalTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int changedNumber;
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //つまみを動かした際に呼ばれる
-                changedNumber = seekBar.getProgress();
-                staticIntervalTextView.setText("データ取得間隔 : " + String.valueOf(changedNumber) + " 秒");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                //つまみに触れた時に呼ばれる
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //つまみを離した時に呼ばれる
-                changedNumber = seekBar.getProgress();
-
-                if (changedNumber < 1) { changedNumber = 1; }
-
-                staticIntervalTextView.setText("データ取得間隔 : " + String.valueOf(changedNumber) + " 秒");
-
-                //時間の保存
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt(PARAM_INTERVAL_TIME, changedNumber);
-                editor.commit();
-
-                //serviceに設定
-//                setIntervalTime2Service(changedNumber);
-            }
-        });
+        //GPSが無効になっている場合は有効にするよう促す
+        gpsCheck("GPSを有効にしてください");
     }
 
     public void setFinishTime2Service(final int time) {
@@ -253,6 +243,62 @@ public class MainActivity extends AppCompatActivity {
         if (mService == null) {
             return;
         }
+    }
+
+    public void gpsCheck(String message) {
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        final boolean gpsEnabled = locationManager.isProviderEnabled((LocationManager.GPS_PROVIDER));
+        if (gpsEnabled) {
+            return;
+        }
+
+        OkCancelDialog dialogFragment = OkCancelDialog.newInstance(R.string.app_name, message);
+        dialogFragment.setOnOkClickListener(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(settingsIntent);
+            }
+        });
+        dialogFragment.setOnCancelClickListener(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), "dialog_fragment");
+    }
+
+    public void showInputProjectIdDialog() {
+        final TextView proIdStr = (TextView) findViewById(R.id.projectId);
+        final EditText editText = new EditText(MainActivity.this);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        editText.setText("");
+
+        EditTextDialog dialogFragment = EditTextDialog
+                .newInstance(R.string.app_name, "Project ID を入力してください");
+        dialogFragment.setOnOkClickListener(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String str = editText.getText().toString();
+                if (str.equals("")) {
+                    Toast.makeText(MainActivity.this, "入力してください", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //アプリにidを登録
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(PARAM_PROJECT_ID, str);
+                editor.commit();
+                proIdStr.setText("Project Id : " + editText.getText().toString());
+            }
+        });
+        dialogFragment.setEditText(editText);
+        dialogFragment.show(getSupportFragmentManager(), "dialog_fragment");
+    }
+
+    public void onProIdClick(View v) {
+        showInputProjectIdDialog();
     }
 
     public void startStrTimer() {
@@ -285,31 +331,55 @@ public class MainActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            /*
-                            textViews[2].setText("Accuracy : " + updateData.getAccuracy());
-                            textViews[3].setText("Speed : " + updateData.getSpeed());
-                            textViews[4].setText("Bearing : " + updateData.getBearing());
+                            sensor_strs[2].setText("Accuracy : " + updateData.getAccuracy());
+                            sensor_strs[3].setText("Speed : " + updateData.getSpeed());
+                            sensor_strs[4].setText("Bearing : " + updateData.getBearing());
 
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T' HH:mm:ss.SSSz");
-                            textViews[6].setText("Timestamp : " + sdf.format(updateData.getTime() *1000).toString());
+                            sensor_strs[6].setText("GPSTime : " + sdf.format(updateData.getTimestamp() * 1000).toString());
 
 //                            長すぎるので整形
-                            BigDecimal bd = new BigDecimal(updateData.getLatitude());
+                            BigDecimal bd = new BigDecimal(updateData.getLat());
                             BigDecimal bdLatitude = bd.setScale(8, BigDecimal.ROUND_DOWN);
-                            textViews[0].setText("Latitude : " + bdLatitude.doubleValue());
+                            sensor_strs[0].setText("Latitude : " + bdLatitude.doubleValue());
 
-                            bd = new BigDecimal(updateData.getLongitude());
+                            bd = new BigDecimal(updateData.getLng());
                             BigDecimal bdLongitude = bd.setScale(8, BigDecimal.ROUND_DOWN);
-                            textViews[1].setText("Longitude : " + bdLongitude.doubleValue());
+                            sensor_strs[1].setText("Longitude : " + bdLongitude.doubleValue());
 
                             bd = new BigDecimal(updateData.getAltitude());
                             BigDecimal bdAltitude = bd.setScale(8, BigDecimal.ROUND_DOWN);
-                            textViews[5].setText("Altitude : " + bdAltitude.doubleValue());
+                            sensor_strs[5].setText("Altitude : " + bdAltitude.doubleValue());
+
+                            sensor_strs[7].setText("Light : " + updateData.getLight());
+
+                            sensor_strs[8].setText("Pressure : " + updateData.getPressure());
+
+                            sensor_strs[9].setText("Temperature : " + updateData.getTemprature());
+
+                            sensor_strs[10].setText("Humidity : " + updateData.getHumidity());
+
+                            sensor_strs[11].setText("Bearing : " + updateData.getBearing());
+
+                            sensor_strs[12].setText("Step : " + updateData.getStep());
+
+                            double[] accelerometers = updateData.getAccelerometers();
+                            if (accelerometers != null) {
+                                sensor_strs[13].setText("Accelerometer_x : " + accelerometers[0]);
+                                sensor_strs[14].setText("Accelerometer_y : " + accelerometers[1]);
+                                sensor_strs[15].setText("Accelerometer_z : " + accelerometers[2]);
+                            }
+
+                            double[] gyroscopes = updateData.getGyroscope();
+                            if (gyroscopes != null) {
+                                sensor_strs[16].setText("Gyroscope_x : " + gyroscopes[0]);
+                                sensor_strs[17].setText("Gyroscope_y : " + gyroscopes[1]);
+                                sensor_strs[18].setText("Gyroscope_z : " + gyroscopes[2]);
+                            }
 //                            ここまで
 
-                            geoStr.setText(reverseGeocode(updateData.getLatitude(), updateData.getLongitude()));
+                            geoStr.setText(reverseGeocode(updateData.getLat(), updateData.getLng()));
 
-                            */
                         }
                     });
                 }
@@ -329,6 +399,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartService(View v) {
+        gpsCheck("GPSを有効にしてください");
+
         Intent intent = new Intent(this, GpsService.class);
         startService(intent);
 
@@ -367,10 +439,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onTestSend(View v) {
-        //exec_post(LogData.newInstance(35.689689, 139.692692, 10.53f, System.currentTimeMillis() / 1000L, 10));
-    }
-
     private boolean isServiceWorking() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -383,6 +451,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String reverseGeocode(double latitude, double longitude) {
         String str = "現在地を特定できません。";
+        if (latitude == 0.0 && longitude == 0.0) {
+            return str;
+        }
         Geocoder geocoder = new Geocoder(this, Locale.JAPAN);
         List<Address> addressList = null;
 
